@@ -1,14 +1,16 @@
 module "service" {
-  source = "./modules/ecs-service"
+  for_each = local.services
+
+  source = "./module/ecs-service"
 
   cluster_name = var.cluster_name
   environment  = var.environment
-  image        = "${var.registry}/sdm-service:${var.environment}"
+  image        = "${var.registry}/sdm-${each.key}:${var.environment}"
   name         = "service"
+  parameters   = each.value.parameters
+}
 
-  parameters = [
-    "sdm-instructor",
-    "sdm-location",
-    "sdm-version"
-  ]
+moved {
+  from = module.service
+  to   = module.service["service"]
 }
